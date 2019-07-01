@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>计算器</title>
+</head>
+
+<body>
+<script>
+    var point;
+    var error;
+    var conti;
+    var tokens;
+    var pc;
+    var length;
+    var result;
+
+    function caculate(a, b, op) {
+        if (op == 1) {
+            return a + b;
+        } else if (op == 2) {
+            return a - b;
+        } else if (op == 3) {
+            return a * b;
+        } else if (op == 4) {
+            if (b==0) {
+                if (error==false) {
+                    result = "Divided by 0!";
+                    error = true;
+                }
+                return 0;
+            } else {
+                return a / b;
+            }
+        }
+        return 0;
+    }
+
+    function doit() {
+        var a = next();
+        var operator
+        while (pc < length) {
+            operator = tokens[pc];
+            pc++;
+            if (operator == ')') {
+                pc--;
+                return a;
+            }
+            if (pc==length) {
+                if (error==false) {
+                    result = "Wrong formula!";
+                    error = true;
+                }
+                return 0;
+            }
+            var b = next();
+            if (operator == '+') {
+                a = caculate(a, b, 1);
+            } else if (operator == '-') {
+                a = caculate(a, b, 2);
+            } else if (error==false) {
+                result = "Wrong formula!";
+                error = true;
+                return 0;
+            }
+        }
+        return a;
+    }
+
+    function next() {
+        point = false;
+        var token = tokens[pc];
+        pc++;
+        if (token == '(') {
+            var a = doit();
+            if (pc==length) {
+                if (error==false) {
+                    result = "Wrong formula!";
+                    error = true;
+                }
+                return 0;
+            }
+            token = tokens[pc];
+            pc++;
+            if (token == ')') {
+                token = tokens[pc];
+                if (token=='!') {
+                    if (a == 0) {
+                        a = 1;
+                    } else if (a%1==0) {
+                        var theresult = 1;
+                        for (var i = 1; i <= a; i++) {
+                            theresult = theresult * i;
+                        }
+                        a = theresult;
+                    } else if (error==false) {
+                        result = "Wrong formula!";
+                        error = true;
+                        return 0;
+                    } else {
+                        return 0;
+                    }
+                    pc++
+                }
+                return a;
+            }
+            if (error==false) {
+                result = "Wrong formula!";
+                error = true;
+            }
+            return 0;
+        } else if ((token >= '0') && (token <= '9')) {
+            var a = 1;
+            var thetoken = token - '0';
+            var dividetime = 10;
+            a = a * thetoken;
+            while (pc < length) {
+                token = tokens[pc];
+                if ((token >= '0') && (token <= '9')) {
+                    thetoken = token - '0';
+                    if (point == false) {
+                        a = a * 10 + thetoken;
+                    } else {
+                        a = a + thetoken / dividetime;
+                        dividetime = dividetime * 10;
+                    }
+                } else if (token == '.') {
+                    if (point == false) {
+                        point = true;
+                    } else if (error==false) {
+                        result = "Wrong formula!";
+                        error = true;
+                        return 0;
+                    } else {
+                        return 0;
+                    }
+                } else if (token == '!') {
+                    if (a==0) {
+                        pc++;
+                        return 1;
+                    } else if (a%1==0) {
+                        var theresult = 1;
+                        for (var i = 1; i <= a; i++) {
+                            theresult = theresult * i;
+                        }
+                        a = theresult;
+                    }
+                    else if (error==false) {
+                        result = "Wrong formula!";
+                        error = true;
+                        return 0;
+                    }
+                    else {
+                        return 0;
+                    }
+                } else if (token=='*') {
+                    pc++;
+                    var b = next();
+                    a = caculate(a,b,3);
+                    return a;
+                } else if (token=='/') {
+                    pc++;
+                    var b = next();
+                    a = caculate(a,b,4);
+                    return a;
+                } else {
+                    return a;
+                }
+                pc++;
+            }
+            return a;
+        } else if (error==false) {
+            result = "Wrong formula!";
+            error = true;
+            return 0;
+        }
+        else {
+            return 0;
+        }
+    }
+
+    function stream() {
+        error = false;
+        tokens = document.getElementById("formula").value;
+        if (tokens=="exit") {
+            conti = false;
+            return 0;
+        }
+        pc = 0;
+        length = tokens.length;
+        if (length != 0) {
+            return doit();
+        }
+        return 0;
+    }
+
+    function main() {
+        conti = true;
+        error = false;
+        result = "0";
+        var firstresult;
+        firstresult = stream();
+        if (error == false) {
+            result = firstresult;
+        }
+        if (conti == false) {
+            result = "Goodbye!";
+        }
+        document.getElementById("result").innerHTML=result;
+    }
+</script>
+输入计算式：
+<input id="formula" class="formula" type="text" value="0" />
+<input type="button" value="=" onclick=main() />
+<p id="result">0</p>
+</body>
+</html>
