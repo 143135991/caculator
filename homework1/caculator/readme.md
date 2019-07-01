@@ -1,4 +1,4 @@
-# coculator
+# caculator
 ######based on java, maven and junit
 
 #####start your caculator
